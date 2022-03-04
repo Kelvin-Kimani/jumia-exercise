@@ -54,9 +54,7 @@ public class Customer {
         return country;
     }
 
-    public void setCountry(String country) {
-        this.country = country;
-    }
+    public void setCountry(String country) { this.country = country; }
 
     public String getState() {
         return state;

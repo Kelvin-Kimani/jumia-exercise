@@ -6,17 +6,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public record CustomerService(CustomerRepository customerRepository,
-                              CameroonPhoneValidator cameroonPhoneValidator,
-                              EthiopiaPhoneValidator ethiopiaPhoneValidator,
-                              MoroccoPhoneValidator moroccoPhoneValidator,
-                              MozambiquePhoneValidator mozambiquePhoneValidator,
-                              UgandaPhoneValidator ugandaPhoneValidator) {
+                              CameroonValidator cameroonValidator,
+                              EthiopiaValidator ethiopiaValidator,
+                              MoroccoValidator moroccoValidator,
+                              MozambiqueValidator mozambiqueValidator,
+                              UgandaValidator ugandaValidator) {
 
     @Autowired
     public CustomerService {
@@ -24,92 +23,24 @@ public record CustomerService(CustomerRepository customerRepository,
 
     /* Validator
      *   - Used in stream to map data to our transient fields.
-     *   - Uses phone number prefix in a switch case to select the country validator to use.
+     *   - Uses country prefix, derived from the phone number, in a switch case to select the country validator to use.
      *  */
-    private Customer validateCustomer(Customer customer) {
+    Customer validateCustomer(Customer customer) {
 
         switch (customer.getPhone().substring(0, 5)) {
-
-            case CameroonPhoneValidator.CAMEROON_PREFIX:
-                //Implementation
-                customer.setCountry(cameroonPhoneValidator.getCountry());
-                customer.setCountryCode(cameroonPhoneValidator.getCountryCode());
-                customer.setCountryPrefix(cameroonPhoneValidator.getCountryPrefix());
-
-                //check phone number validity
-                if (cameroonPhoneValidator.validate(customer.getPhone())) {
-                    customer.setState("Valid");
-                } else customer.setState("Invalid");
-
-                break;
-
-
-            case EthiopiaPhoneValidator.ETHIOPIA_PREFIX:
-                //Implementation
-                customer.setCountry(ethiopiaPhoneValidator.getCountry());
-                customer.setCountryCode(ethiopiaPhoneValidator.getCountryCode());
-                customer.setCountryPrefix(ethiopiaPhoneValidator.getCountryPrefix());
-
-                //check phone number validity
-                if (ethiopiaPhoneValidator.validate(customer.getPhone())) {
-                    customer.setState("Valid");
-                } else customer.setState("Invalid");
-
-                break;
-
-
-            case MoroccoPhoneValidator.MOROCCO_PREFIX:
-
-                //Implementation
-                customer.setCountry(moroccoPhoneValidator.getCountry());
-                customer.setCountryCode(moroccoPhoneValidator.getCountryCode());
-                customer.setCountryPrefix(moroccoPhoneValidator.getCountryPrefix());
-
-                //check phone number validity
-                if (moroccoPhoneValidator.validate(customer.getPhone())) {
-                    customer.setState("Valid");
-                } else customer.setState("Invalid");
-
-                break;
-
-
-            case MozambiquePhoneValidator.MOZAMBIQUE_PREFIX:
-
-                //Implementation
-                customer.setCountry(mozambiquePhoneValidator.getCountry());
-                customer.setCountryCode(mozambiquePhoneValidator.getCountryCode());
-                customer.setCountryPrefix(mozambiquePhoneValidator.getCountryPrefix());
-
-                //check phone number validity
-                if (mozambiquePhoneValidator.validate(customer.getPhone())) {
-                    customer.setState("Valid");
-                } else customer.setState("Invalid");
-
-                break;
-
-
-            case UgandaPhoneValidator.UGANDA_PREFIX:
-
-                //Implementation
-                customer.setCountry(ugandaPhoneValidator.getCountry());
-                customer.setCountryCode(ugandaPhoneValidator.getCountryCode());
-                customer.setCountryPrefix(ugandaPhoneValidator.getCountryPrefix());
-
-                //check phone number validity
-                if (ugandaPhoneValidator.validate(customer.getPhone())) {
-                    customer.setState("Valid");
-                } else customer.setState("Invalid");
-
-                break;
-
+            case CameroonValidator.CAMEROON_PREFIX -> cameroonValidator.validateAndUpdateCustomer(customer);
+            case EthiopiaValidator.ETHIOPIA_PREFIX -> ethiopiaValidator.validateAndUpdateCustomer(customer);
+            case MoroccoValidator.MOROCCO_PREFIX -> moroccoValidator.validateAndUpdateCustomer(customer);
+            case MozambiqueValidator.MOZAMBIQUE_PREFIX -> mozambiqueValidator.validateAndUpdateCustomer(customer);
+            case UgandaValidator.UGANDA_PREFIX -> ugandaValidator.validateAndUpdateCustomer(customer);
         }
 
         return customer;
     }
 
-    /* READ */
 
-    /* Gets all customers from the database */
+    /* READ */
+    /* Returns all customers from the database */
     public List<Customer> getAllCustomers() {
         return customerRepository.findAll()
                 .stream()
@@ -117,7 +48,9 @@ public record CustomerService(CustomerRepository customerRepository,
                 .collect(Collectors.toList());
     }
 
-    /* Gets customers by country */
+    /* Returns customers by country
+    *  - Takes in countryPrefix as a parameter
+    *  */
     public List<Customer> getCustomersWithCountry(String countryPrefix) {
         return customerRepository.findAllByPhoneStartsWith(countryPrefix)
                 .stream()
@@ -125,7 +58,9 @@ public record CustomerService(CustomerRepository customerRepository,
                 .collect(Collectors.toList());
     }
 
-    /* Gets customers according to the validity of their phone numbers */
+    /* Returns customers according to the validity of their phone numbers
+    * - Takes in a state of either 'valid' or 'invalid' as a parameter.
+    * */
     public List<Customer> getCustomersWithValidityPhoneNumbers(String validity) {
         return getAllCustomers()
                 .stream()
@@ -133,7 +68,9 @@ public record CustomerService(CustomerRepository customerRepository,
                 .collect(Collectors.toList());
     }
 
-    /* Gets customers by country and validity of their phone numbers */
+    /* Returns customers by country and validity of their phone numbers
+    * - Takes in both countryPrefix and validity state as parameters
+    * */
     public List<Customer> getCustomersByCountryAndValidity(String countryPrefix, String validity) {
         return getAllCustomers()
                 .stream()
@@ -143,7 +80,7 @@ public record CustomerService(CustomerRepository customerRepository,
     }
 
 
-    /* Gets all users with pagination */
+    /* Returns all users with pagination */
     public Page<Customer> getCustomersWithPagination(int offset, int pageSize) {
         List<Customer> paginatedCustomers = customerRepository.findAll(PageRequest.of(offset, pageSize))
                 .stream()

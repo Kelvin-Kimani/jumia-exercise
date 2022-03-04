@@ -5,9 +5,6 @@ public class Country {
     private String countryCode;
     private String countryPrefix;
 
-    public Country() {
-    }
-
     public Country(String countryName, String countryCode, String countryPrefix) {
         this.countryName = countryName;
         this.countryCode = countryCode;

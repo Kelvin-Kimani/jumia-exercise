@@ -4,9 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.Map;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -19,10 +17,6 @@ public class CustomerController {
         this.customerService = customerService;
     }
 
-    @GetMapping("/welcome")
-    public String welcomePage(){
-        return "The app is up and running";
-    }
 
     @GetMapping("/customers")
     public ResponseEntity<List<Customer>> getAllCustomers(){
