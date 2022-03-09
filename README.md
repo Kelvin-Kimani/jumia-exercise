@@ -27,16 +27,16 @@ Again, clone the project to your local repository and navigate to the root direc
 
 1. Perform `maven clean` and `maven install` to get the application jar in the target folder. 
    > Alternatively, could use maven in your IDE to perform the same.
-2. Open the terminal and run ensure docker engine is running. Try running `docker version` which will return the version you are using.
+2. Open the terminal and ensure docker engine is running. Try running `docker version` which will return the version you are using.
 3. Now that the daemon is running, run the following command `docker build -t spring-boot-app --target spring-boot-app .` to build the spring boot image.
 4. Run `docker build -t react-app --target react-app .` command to build the react image.
 5. Ensure both images are present by running `docker images`, and you'll see both of them with their respective tags.
 
 **Running images**
 
-1. Let's start with the backend. Run `docker run -d p8080:8080 spring-boot-app` command to run a container with our image.
+1. Let's start with the backend. Run `docker run -d p8080:8080 spring-boot-app` command to run a container with the image.
    > Try accessing this endpoint [http://localhost:8080/customers](http://localhost:8080/customers) that should return a list of all customers.
-2. If up and running, let's run our front end image.
-3. Run `docker run -d p3000:3000 react-app` command and access [http://localhost:3000/](http://localhost:3000/) on our browser
+2. If up and running, let's run the front end image.
+3. Run `docker run -d p3000:3000 react-app` command and access [http://localhost:3000/](http://localhost:3000/) on your browser
 4. If up and accessible, then the applications are working as they should.
 5. Enjoy!
